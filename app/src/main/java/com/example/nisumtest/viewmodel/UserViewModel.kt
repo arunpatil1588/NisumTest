@@ -8,6 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,9 +29,14 @@ class UserViewModel @Inject constructor(private val repository: UserRepository) 
             _error.value = ""
             try {
                 _users.value = repository.getUsers(count).results
+
+            } catch (e: IOException) {
+                _error.value = "Network error. Please check your connection."
+            } catch (e: HttpException) {
+                _error.value = "Server error. Please try again later."
             } catch (e: Exception) {
                 _error.value = "Failed to load users"
-            } finally {
+            }finally {
                 _isLoading.value = false
             }
         }
